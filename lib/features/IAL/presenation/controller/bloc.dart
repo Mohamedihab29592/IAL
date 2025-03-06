@@ -115,6 +115,8 @@ class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
       ExportDocumentEvent event,
       Emitter<IncidentState> emit,
       ) async {
+    final previousState = state;
+
     try {
       final previousState = state;
       if (previousState is! IncidentLoaded) return;
@@ -156,6 +158,8 @@ class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
         print(e.toString());
       }
       emit(IncidentError('Failed to export document: $e'));
+      emit(previousState);
+
     }
   }
 

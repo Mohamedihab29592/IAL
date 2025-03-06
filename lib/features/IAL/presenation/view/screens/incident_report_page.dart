@@ -50,11 +50,13 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
   Widget build(BuildContext context) {
     return BlocConsumer<IncidentBloc, IncidentState>(
       listener: (context, state) {
-        if (state is DocumentExported) {
+        if (state is IncidentError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('File saved successfully in ${state.path}')),
-          );
+                content: Text(state.message)),
+          );        }
+        if (state is DocumentExported) {
+
         }
         if (state is IncidentLoaded) {
           final siteDetails = state.formData['siteDetails'] as SiteDetailModel?;
@@ -64,9 +66,7 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
         }
       },
       builder: (context, state) {
-        if (state is IncidentError) {
-          return Center(child: Text(state.message));
-        }
+
 
         return   PopScope(
             canPop: false,
@@ -1157,6 +1157,14 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
                         ));
 
                       }
+                    else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Fill required data"),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(16.0),

@@ -105,6 +105,7 @@ class LocationsScreen extends StatelessWidget {
                     if (await canLaunchUrl(googleMapsUri)) {
                       await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
                     } else {
+                      print('Could not open maps. URL: ${googleMapsUri.toString()}');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Could not open maps. URL: ${googleMapsUri.toString()}'),

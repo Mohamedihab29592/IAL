@@ -804,86 +804,97 @@ class _AuditScreenState extends State<AuditScreen> {
                     backgroundColor: WidgetStateProperty.all(const Color(0xFFD32F2F)),
                   ),
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
+                    if (!_formKey.currentState!.validate() ) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Fill required data"),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                    else if (_selectedImages.isEmpty)
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Add required photos"),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    else {
                       context
                           .read<IncidentBloc>()
                           .add(ShareReportEvent(formData: {
-                            // Basic Info
-                            'auditDate': _dateController.text,
-                            'auditTime': _timeController.text,
-                            'siteId': _locationController.text,
-                            'incidentLocation':
-                                _incidentLocationController.text,
-                            'teamLeader': _teamLeadController.text,
+                        // Basic Info
+                        'auditDate': _dateController.text,
+                        'auditTime': _timeController.text,
+                        'siteId': _locationController.text,
+                        'incidentLocation':
+                        _incidentLocationController.text,
+                        'teamLeader': _teamLeadController.text,
 
-                            // Site Characteristics
-                            'securityType': _secTypeController.text,
-                            'siteType': _siteTypeController.text,
-                            'siteTypeOptions': _siteTypeOptionsController.text,
+                        // Site Characteristics
+                        'securityType': _secTypeController.text,
+                        'siteType': _siteTypeController.text,
+                        'siteTypeOptions': _siteTypeOptionsController.text,
 
-                            // Perimeter Security
-                            'fenceStatus': _fenceStatusController.text,
-                            'fenceType': _fenceTypeController.text,
-                            'guardRoom': _guardRoomController.text,
-                            'mainGate': _mainGateController.text,
-                            'lockMainGate': _lockMainController.text,
-                            'lockMainGateType': _showLockTypeField
-                                ? _lockMainTypeController.text
-                                : null,
-                            'shroudBox': _shroudBoxController.text,
-                            'barbedWire': _BarbedWireController.text,
+                        // Perimeter Security
+                        'fenceStatus': _fenceStatusController.text,
+                        'fenceType': _fenceTypeController.text,
+                        'guardRoom': _guardRoomController.text,
+                        'mainGate': _mainGateController.text,
+                        'lockMainGate': _lockMainController.text,
+                        'lockMainGateType': _showLockTypeField
+                            ? _lockMainTypeController.text
+                            : null,
+                        'shroudBox': _shroudBoxController.text,
+                        'barbedWire': _BarbedWireController.text,
 
-                            // CCTV Details
-                            'cctv': _cCTVController.text,
-                            'cctvLocation': _showCCTVField
-                                ? _locationCCTVController.text
-                                : null,
+                        // CCTV Details
+                        'cctv': _cCTVController.text,
+                        'cctvLocation': _showCCTVField
+                            ? _locationCCTVController.text
+                            : null,
 
-                            // Power Supply
-                            'powerType': _powerController.text,
-                            'generatorOwnership': _genratorOwnerController.text,
-                            'generatorType': _genratortypeController.text,
+                        // Power Supply
+                        'powerType': _powerController.text,
+                        'generatorOwnership': _genratorOwnerController.text,
+                        'generatorType': _genratortypeController.text,
 
-                            // Conditional fields based on indoor/outdoor
-                            'numberOfCabinets': _numberCabinetController.text,
-                            'cabinetType': _cabinetTypeController.text,
-                            'cabinetCage': _cabinetCageController.text,
+                        // Conditional fields based on indoor/outdoor
+                        'numberOfCabinets': _numberCabinetController.text,
+                        'cabinetType': _cabinetTypeController.text,
+                        'cabinetCage': _cabinetCageController.text,
                         'numberOfPSUs': _showOutdoorField
                             ? _numberPsuController.text
                             : _indoorNumberPsuController.text,
-                            'numberOfBatteries': _numberBattryController.text,
-                            'batteryType': _typeBattryController.text,
-                            'batteryDescription': _battryDecController.text,
-                            'lockOfCage': _lockCageDecController.text,
+                        'numberOfBatteries': _numberBattryController.text,
+                        'batteryType': _typeBattryController.text,
+                        'batteryDescription': _battryDecController.text,
+                        'lockOfCage': _lockCageDecController.text,
                         'lockType': _showOutdoorField && _lockCageField
                             ? _lockTypeDecController.text
                             : (_showIndoorField && _shelterLockField
                             ? _indoorLockTypeController.text
                             : null),
 
-                            // Indoor specific
-                            'shelterDoorStatus':
-                                _shelterDoorStatusController.text,
-                            'doubleShutter': _doubleShelterController.text,
-                            'doubleShutterLock':
-                                _doubleShelterLockDecController.text,
-                            'numberOfIndoorACs': _numberACController.text,
-                            'acType': _typeACController.text,
-                            'numberOfOutdoorACs': _numberACOutController.text,
-                            'acOduCage': _acODCController.text,
-                            'lockOfAcOduCage': _locACController.text,
+                        // Indoor specific
+                        'shelterDoorStatus':
+                        _shelterDoorStatusController.text,
+                        'doubleShutter': _doubleShelterController.text,
+                        'doubleShutterLock':
+                        _doubleShelterLockDecController.text,
+                        'numberOfIndoorACs': _numberACController.text,
+                        'acType': _typeACController.text,
+                        'numberOfOutdoorACs': _numberACOutController.text,
+                        'acOduCage': _acODCController.text,
+                        'lockOfAcOduCage': _locACController.text,
 
-                            // For email subject
-                            'locationName': _locationController.text,
-                          },      images: _selectedImages, // Add the images here
+                        // For email subject
+                        'locationName': _locationController.text,
+                      },      images: _selectedImages, // Add the images here
                       ));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please fill required data"),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
+
                     }
                   },
                   child: const Padding(

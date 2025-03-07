@@ -38,7 +38,6 @@ dependencies:
   share_plus: ^10.1.1
   docx_template: ^0.4.0
   path_provider: ^2.1.4
-  permission_handler: ^11.3.1
   image_picker: ^1.1.2
   flutter_bloc: ^9.0.0
   get_it: ^8.0.3

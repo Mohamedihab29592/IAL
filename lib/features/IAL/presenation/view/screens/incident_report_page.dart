@@ -1156,6 +1156,7 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
                           imageFiles: _selectedImages,
                         ));
 
+
                       }
                     else {
                       ScaffoldMessenger.of(context).showSnackBar(

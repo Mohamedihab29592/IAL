@@ -111,120 +111,135 @@ class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
     }
   }
 
-  Future<void> _onExportDocument(
-      ExportDocumentEvent event,
-      Emitter<IncidentState> emit,
-      ) async {
-    final previousState = state;
-
-    try {
+    Future<void> _onExportDocument(
+        ExportDocumentEvent event,
+        Emitter<IncidentState> emit,
+        ) async {
       final previousState = state;
-      if (previousState is! IncidentLoaded) return;
-      final data = await rootBundle.load('assets/Incident report.docx');
-      final bytes = data.buffer.asUint8List();
 
-      // Save the template to a writable directory
-      final directory = await getApplicationDocumentsDirectory();
-      final fileDoc = File('${directory.path}/Document.docx');
-      await fileDoc.writeAsBytes(bytes);
+      try {
+        if (previousState is! IncidentLoaded) return;
+        final data = await rootBundle.load('assets/Incident report.docx');
 
-      // Load the document for modification
-      final docx = await DocxTemplate.fromBytes(await fileDoc.readAsBytes());
+        final bytes = data.buffer.asUint8List();
 
-      // Prepare content
-      final content = _prepareDocumentContent(event.formData, event.imageFiles!);
+        // Save the template to a writable directory
 
-      // Generate document
-      final generatedDoc = await docx.generate(content);
-      if (generatedDoc == null) {
-        throw Exception("Failed to generate document");
-      }
+        final directory = await getApplicationDocumentsDirectory();
+        print("directory file ${directory.path}");
 
-      // Save to Documents folder
-      final outputDir = Directory('/storage/emulated/0/Documents');
-      if (!outputDir.existsSync()) {
-        outputDir.createSync(recursive: true);
-      }
-
-      final outputFile = File(
-          '${outputDir.path}/Incident report - (${event.formData['siteId']} - ${event.formData['location']}).docx'
-      );
-      await outputFile.writeAsBytes(generatedDoc);
-
-      emit(DocumentExported(outputFile.path));
-      emit(previousState);
-    } catch (e) {
-      if (kDebugMode) {
-        print(e.toString());
-      }
-      emit(IncidentError('Failed to export document: $e'));
-      emit(previousState);
-
-    }
-  }
-
-  Content _prepareDocumentContent(Map<String, dynamic> formData, List<File>  imageFiles) {
-
-    Content content = Content()
-      ..add(TextContent('date', formData['date']))
-      ..add(TextContent('type', formData['type']))
-      ..add(TextContent('time', formData['time']))
-      ..add(TextContent('reported', formData['reported']))
-      ..add(TextContent('location', formData['location']))
-      ..add(TextContent('address', formData['address']))
-      ..add(TextContent('detailes', formData['detailes']))
-      ..add(TextContent('siteId', formData['siteId']))
-      ..add(TextContent('missing', formData['missing']))
-      ..add(TextContent('customer id', formData['customerId']))
-      ..add(TextContent('socAction', '${formData['socAction']}'))
-      ..add(TextContent('doorAlarm', formData['doorAlarm']))
-      ..add(TextContent('guardExsist', formData['guardExsist']))
-      ..add(TextContent('doorOpen', formData['doorOpen']))
-      ..add(TextContent('cctv', formData['cctv']))
-      ..add(TextContent('roadCctv', formData['roadCctv']))
-      ..add(TextContent('guardingRoom', formData['guardingRoom']))
-      ..add(TextContent('guardAttac', formData['guardAttac']))
-      ..add(TextContent('policere', formData['policere']))
-      ..add(TextContent('islegal', formData['islegal']))
-      ..add(TextContent('manager', formData['manager']))
-      ..add(TextContent('super', formData['super']))
-      ..add(TextContent('photos', formData['photos']))
-      ..add(TextContent('videos', formData['videos']))
-      ..add(TextContent('othereq', formData['othereq']))
-      ..add(TextContent('authEqu', formData['authEqu']))
-      ..add(TextContent('concreate', formData['concreate']))
-      ..add(TextContent('sitehis', formData['sitehis']))
-      ..add(TextContent('guardname', formData['guardname']))
-      ..add(TextContent('guardcon', formData['guardcon']))
-      ..add(TextContent('guardid', formData['guardid']))
-      ..add(TextContent('invdet', formData['invdet']))
-      ..add(TextContent('corective', formData['corective']))
-      ..add(TextContent('attackDetailes', formData['attackDetailes']))
-      ..add(TextContent('finalconc', formData['finalconc']))
-      ..add(TextContent('legalAction', formData['legalAction']))
-      ..add(TextContent('persons', formData['persons']))
-      ..add(TextContent('policenu', formData['policenu']))
-      ..add(TextContent('invereport', formData['invereport']))
-      ..add(TextContent('vodafone', formData['vodafone']));
+        final fileDoc = File('${directory.path}/Document.docx');
+        await fileDoc.writeAsBytes(bytes);
 
 
+        // Load the document for modification
+
+        final docx = await DocxTemplate.fromBytes(await fileDoc.readAsBytes());
 
 
-    // Add image if available
-    for (int i = 0; i < imageFiles.length; i++) {
-      File imageFile = imageFiles[i];
-      if (imageFile.existsSync()) {
-        final imageBytes = imageFile.readAsBytesSync();
-        if (imageBytes.isNotEmpty) {
-          final tag = i == 0 ? 'image' : 'image$i';
-          content.add(ImageContent(tag, imageBytes));
+        // Prepare content
+        final content = _prepareDocumentContent(event.formData, event.imageFiles!);
+print("content added");
+        // Generate document
+        final generatedDoc = await docx.generate(content);
+        print("generatedDoc runtime type: ${generatedDoc.runtimeType}");
+        print("generatedDoc length: ${generatedDoc?.length}");
+
+        if (generatedDoc == null) {
+          throw Exception("Failed to generate document");
         }
+
+        // Save to Documents folder
+
+        final outputDir = Directory('/storage/emulated/0/Documents');
+
+        if (!outputDir.existsSync()) {
+          outputDir.createSync(recursive: true);
+        }
+
+        final outputFile = File(
+            '${outputDir.path}/Incident report - (${event.formData['siteId']} - ${event.formData['location']}).docx'
+        );
+        await outputFile.writeAsBytes(generatedDoc);
+
+        emit(DocumentExported(outputFile.path));
+        emit(previousState);
+      } catch (e,stackTrace) {
+        if (kDebugMode) {
+          print(e.toString());
+        }
+        print(stackTrace);
+        emit(IncidentError('Failed to export document: $e'));
+        emit(previousState);
+
       }
     }
 
+    Content _prepareDocumentContent(Map<String, dynamic> formData, List<File>  ?imageFiles) {
 
-    return content;
-  }
+      Content content = Content()
+        ..add(TextContent('date', formData['date']))
+        ..add(TextContent('type', formData['type']))
+        ..add(TextContent('time', formData['time']))
+        ..add(TextContent('reported', formData['reported']))
+        ..add(TextContent('location', formData['location']))
+        ..add(TextContent('address', formData['address']))
+        ..add(TextContent('detailes', formData['detailes']))
+        ..add(TextContent('siteId', formData['siteId']))
+        ..add(TextContent('missing', formData['missing']))
+        ..add(TextContent('customer id', formData['customerId']))
+        ..add(TextContent('socAction', '${formData['socAction']}'))
+        ..add(TextContent('doorAlarm', formData['doorAlarm']))
+        ..add(TextContent('guardExsist', formData['guardExsist']))
+        ..add(TextContent('doorOpen', formData['doorOpen']))
+        ..add(TextContent('cctv', formData['cctv']))
+        ..add(TextContent('roadCctv', formData['roadCctv']))
+        ..add(TextContent('guardingRoom', formData['guardingRoom']))
+        ..add(TextContent('guardAttac', formData['guardAttac']))
+        ..add(TextContent('policere', formData['policere']))
+        ..add(TextContent('islegal', formData['islegal']))
+        ..add(TextContent('manager', formData['manager']))
+        ..add(TextContent('super', formData['super']))
+        ..add(TextContent('photos', formData['photos']))
+        ..add(TextContent('videos', formData['videos']))
+        ..add(TextContent('othereq', formData['othereq']))
+        ..add(TextContent('authEqu', formData['authEqu']))
+        ..add(TextContent('concreate', formData['concreate']))
+        ..add(TextContent('sitehis', formData['sitehis']))
+        ..add(TextContent('guardname', formData['guardname']))
+        ..add(TextContent('guardcon', formData['guardcon']))
+        ..add(TextContent('guardid', formData['guardid']))
+        ..add(TextContent('invdet', formData['invdet']))
+        ..add(TextContent('corective', formData['corective']))
+        ..add(TextContent('attackDetailes', formData['attackDetailes']))
+        ..add(TextContent('finalconc', formData['finalconc']))
+        ..add(TextContent('legalAction', formData['legalAction']))
+        ..add(TextContent('persons', formData['persons']))
+        ..add(TextContent('policenu', formData['policenu']))
+        ..add(TextContent('invereport', formData['invereport']))
+        ..add(TextContent('vodafone', formData['vodafone']));
+
+
+
+
+      // Add image if available
+      if(imageFiles != null){
+        for (int i = 0; i < imageFiles.length; i++) {
+          File imageFile = imageFiles[i];
+          if ( imageFile.existsSync() ) {
+            final imageBytes = imageFile.readAsBytesSync();
+            if (imageBytes.isNotEmpty) {
+              final tag = i == 0 ? 'image' : 'image$i';
+              content.add(ImageContent(tag, imageBytes));
+            }
+          }
+        }
+
+      }
+
+
+      return content;
+    }
 
   Future<void> _onShareReport(
       ShareReportEvent event,

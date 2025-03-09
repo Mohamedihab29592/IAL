@@ -881,7 +881,7 @@ class _AuditScreenState extends State<AuditScreen> {
                     'lockOfAcOduCage': _locACController.text,
 
                     // For email subject
-                    'locationName': _locationController.text,
+                    'locationName': 'Site ID# ${_locationController.text}',
                   },      images: _selectedImages, // Add the images here
                   ));
 

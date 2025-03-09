@@ -248,7 +248,7 @@ print("content added");
     try {
       final emailContent = _generateAuditEmailContent(event.formData);
       await _sendViaOutlook(
-        subject: 'Audit Report: ${event.formData['locationName']}',
+        subject: 'Audit Report: Site ID# ${event.formData['locationName']}',
         body: emailContent,
         recipients: [],
         attachments: event.images,
@@ -373,10 +373,4 @@ print("content added");
     }
   }
 
-// Helper function for encoding query parameters
-  String? encodeQueryParameters(Map<String, String> params) {
-    return params.entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-  }
 }

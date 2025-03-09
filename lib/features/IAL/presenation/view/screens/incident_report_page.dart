@@ -56,7 +56,10 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
                 content: Text(state.message)),
           );        }
         if (state is DocumentExported) {
-
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('File saved successfully in ${state.path}')),
+          );
         }
         if (state is IncidentLoaded) {
           final siteDetails = state.formData['siteDetails'] as SiteDetailModel?;

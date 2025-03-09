@@ -57,3 +57,13 @@ class ShareReportEvent extends IncidentEvent {
   List<Object> get props => [formData,images];
 }
 
+class SendReportEvent extends IncidentEvent {
+  final Map<String, dynamic> formData;
+  final List<File> images;
+
+  SendReportEvent({required this.formData,required this.images});
+  @override
+  List<Object> get props => [formData,images];
+}
+
+

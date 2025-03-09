@@ -802,7 +802,7 @@ class _AuditScreenState extends State<AuditScreen> {
                     ),
                   );
                 }
-                else if (_selectedImages.isEmpty)
+                else if (_selectedImages.length<4)
                 {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

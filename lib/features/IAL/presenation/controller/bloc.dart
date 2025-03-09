@@ -19,6 +19,8 @@ class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
     on<UpdateRadioSelectionEvent>(_onUpdateRadioSelection);
     on<ExportDocumentEvent>(_onExportDocument);
     on<ShareReportEvent>(_onShareReport);
+    on<SendReportEvent>(_onSendEmail);
+
   }
  Map<String, dynamic> incidentType = {};
   Future<void> _onLoadInitialData(
@@ -110,71 +112,67 @@ class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
       emit(currentState.copyWith(radioSelections: newSelections));
     }
   }
+  Future<String> _exportDocumentAndGetPath(
+      Map<String, dynamic> formData, List<File>? imageFile,
+      ) async {
+    final data = await rootBundle.load('assets/Incident report.docx');
+    final bytes = data.buffer.asUint8List();
 
-    Future<void> _onExportDocument(
-        ExportDocumentEvent event,
-        Emitter<IncidentState> emit,
-        ) async {
-      final previousState = state;
+    // Save the template to a writable directory
+    final directory = await getApplicationDocumentsDirectory();
+    final fileDoc = File('${directory.path}/Document.docx');
+    await fileDoc.writeAsBytes(bytes);
 
-      try {
-        if (previousState is! IncidentLoaded) return;
-        final data = await rootBundle.load('assets/Incident report.docx');
+    // Load the document for modification
+    final docx = await DocxTemplate.fromBytes(await fileDoc.readAsBytes());
 
-        final bytes = data.buffer.asUint8List();
+    // Prepare content
+    final content = _prepareDocumentContent(formData, imageFile);
 
-        // Save the template to a writable directory
-
-        final directory = await getApplicationDocumentsDirectory();
-        print("directory file ${directory.path}");
-
-        final fileDoc = File('${directory.path}/Document.docx');
-        await fileDoc.writeAsBytes(bytes);
-
-
-        // Load the document for modification
-
-        final docx = await DocxTemplate.fromBytes(await fileDoc.readAsBytes());
-
-
-        // Prepare content
-        final content = _prepareDocumentContent(event.formData, event.imageFiles!);
-print("content added");
-        // Generate document
-        final generatedDoc = await docx.generate(content);
-        print("generatedDoc runtime type: ${generatedDoc.runtimeType}");
-        print("generatedDoc length: ${generatedDoc?.length}");
-
-        if (generatedDoc == null) {
-          throw Exception("Failed to generate document");
-        }
-
-        // Save to Documents folder
-
-        final outputDir = Directory('/storage/emulated/0/Documents');
-
-        if (!outputDir.existsSync()) {
-          outputDir.createSync(recursive: true);
-        }
-
-        final outputFile = File(
-            '${outputDir.path}/Incident report - (${event.formData['siteId']} - ${event.formData['location']}).docx'
-        );
-        await outputFile.writeAsBytes(generatedDoc);
-
-        emit(DocumentExported(outputFile.path));
-        emit(previousState);
-      } catch (e,stackTrace) {
-        if (kDebugMode) {
-          print(e.toString());
-        }
-        print(stackTrace);
-        emit(IncidentError('Failed to export document: $e'));
-        emit(previousState);
-
-      }
+    // Generate document
+    final generatedDoc = await docx.generate(content);
+    if (generatedDoc == null) {
+      throw Exception("Failed to generate document");
     }
 
+    // Save to Documents folder
+    final outputDir = Directory('/storage/emulated/0/Documents');
+    if (!outputDir.existsSync()) {
+      outputDir.createSync(recursive: true);
+    }
+
+    final outputFile = File(
+        '${outputDir.path}/Incident report - (${formData['siteId']} - ${formData['location']}).docx'
+    );
+
+    await outputFile.writeAsBytes(generatedDoc);
+
+    return outputFile.path;
+  }
+  Future<void> _onExportDocument(
+      ExportDocumentEvent event,
+      Emitter<IncidentState> emit,
+      ) async {
+    final previousState = state;
+
+    try {
+      final previousState = state;
+      if (previousState is! IncidentLoaded) return;
+
+      final outputFilePath = await _exportDocumentAndGetPath(
+          event.formData,
+          event.imageFiles
+      );
+
+      emit(DocumentExported(outputFilePath));
+      emit(previousState);
+    } catch (e) {
+      print(e.toString());
+      emit(IncidentError('Failed to export document: $e'));
+      emit(previousState);
+
+    }
+  }
     Content _prepareDocumentContent(Map<String, dynamic> formData, List<File>  ?imageFiles) {
 
       Content content = Content()
@@ -351,11 +349,21 @@ print("content added");
 
     return buffer.toString();
   }
+  String _generateEmailContent(Map<String, dynamic> formData) {
+    final buffer = StringBuffer();
+
+    buffer.writeln('Dears,\n\n   Please check the incident report for: Site ID# ${formData['siteId']}.\n\nBest Regards\n ${formData['teamLeader']}');
+
+
+    return buffer.toString();
+  }
+
 
   Future<void> _sendViaOutlook({
     required String subject,
     required String body,
     required List<String> recipients,
+    File ? attachment,
     List<File>? attachments,
   }) async {
     try {
@@ -363,7 +371,7 @@ print("content added");
         body: body,
         subject: subject,
         recipients: recipients,
-        attachmentPaths: attachments?.map((file) => file.path).toList() ?? [],
+        attachmentPaths: attachment != null ? [attachment.path] : [],
         isHTML: false,
       );
 
@@ -373,4 +381,41 @@ print("content added");
     }
   }
 
+
+
+
+  Future<void> _onSendEmail(
+      SendReportEvent event,
+      Emitter<IncidentState> emit,
+      ) async {
+    final previousState = state;
+
+    try {
+      // First, export the document
+      final outputFilePath = await _exportDocumentAndGetPath(
+          event.formData,
+          event.images
+      );
+
+      // Create a File from the path
+      final documentFile = File(outputFilePath);
+
+      // Now send the email with the exported document
+      final emailContent = _generateEmailContent(event.formData);
+      await _sendViaOutlook(
+        subject: 'Incident report - (${event.formData['siteId']} - ${event.formData['location']}).docx',
+        body: emailContent,
+        recipients: [],
+        attachment: documentFile,
+      );
+
+      // Emit success state
+
+    } catch (e) {
+      emit(IncidentError('Failed to share incident report: $e'));
+      print(e.toString());
+      emit(previousState);
+
+    }
+  }
 }

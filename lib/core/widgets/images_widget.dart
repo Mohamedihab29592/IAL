@@ -16,7 +16,6 @@ class ImagesWidget extends StatefulWidget {
 }
 
 class _ImagesWidgetState extends State<ImagesWidget> {
-  // Update _pickImage to add a new image to the list
   Future<void> _pickImage(ImageSource source) async {
     try {
       final picker = ImagePicker();
@@ -24,11 +23,9 @@ class _ImagesWidgetState extends State<ImagesWidget> {
       if (pickedFile != null) {
         final imageFile = File(pickedFile.path);
         setState(() {
-          // Limit the maximum number of images to 4
           if (widget.selectedImages.length < widget.numberOfImage) {
             widget.selectedImages.add(imageFile);
           } else {
-            // Optionally, display a message that only 4 images can be added
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Maximum of ${widget.numberOfImage} images allowed.')),
             );

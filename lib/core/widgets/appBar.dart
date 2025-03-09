@@ -85,6 +85,8 @@ AppBar AppbarWidget({
           onPressed: () async {
            if(isIRG)
              {
+               teamLeadController !.clear() ;
+
                typeController!.clear();
                locationController!.clear();
                reporterController!.clear();

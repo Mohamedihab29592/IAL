@@ -39,6 +39,7 @@ var _nameGuardController = TextEditingController();
 var _contactGuardController = TextEditingController();
 var _idGuardController = TextEditingController();
 var _guardAttackDController = TextEditingController();
+var _teamLeadController = TextEditingController();
 
 class _IncidentReportFormState extends State<IncidentReportForm> {
   final _formKey = GlobalKey<FormState>();
@@ -84,6 +85,7 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
                   isIRG: true,
                   context: context,
                   missingController: _missingController,
+                  teamLeadController: _teamLeadController,
                   incidentLocationController:_incidentLocationController,
                   incidentTypeController:_incidentTypeController,
                   typeController: _typeController,
@@ -120,6 +122,14 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
           key: _formKey,
           child: Column(
             children: [
+              MyFormField(
+                showDownMenu: true,
+                title: "Team Leader",
+                controller: _teamLeadController,
+                menuItems: state.lookupData.areaOwner,
+              ),
+              const SizedBox(height: 20),
+
               //Location type
               MyFormField(
                 enableSearchSuggestions: false,
@@ -1165,6 +1175,77 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
                   );
                 }
               }, title:  'Export To Word', icon:  Icons.import_export,),
+              const SizedBox(
+                height: 10,
+              ),
+              Button(  onPressed: () {
+                if(_formKey.currentState!.validate())
+                {
+                  context.read<IncidentBloc>().add(SendReportEvent(
+                    formData: {
+                      "teamLeader":_teamLeadController.text,
+                      "date": _dateController.text,
+                      "type": _incidentTypeController.text,
+                      "time": _timeController.text,
+                      "reported": _reporterController.text,
+                      "siteId": _locationController.text,
+                      "address": _addressController.text,
+                      "detailes": _detailsController.text,
+                      "location": _incidentLocationController.text,
+                      "missing": _missingController.text,
+                      "socAction": state.radioSelections["socAction"] == YesNo.Yes
+                          ? "${state.radioSelections["socAction"].toString().substring(6)} we called the guard and the sheikh but no answer"
+                          : state.radioSelections["socAction"].toString().substring(6),
+
+                      "doorAlarm": state.radioSelections[
+                      "doorAlarm"].toString().substring(6),
+                      "guardExsist": state.radioSelections["guardExsist"].toString().substring(6),
+                      "doorOpen": state.radioSelections["doorOpen"].toString().substring(6),
+                      "cctv": state.radioSelections["cctv"].toString().substring(6),
+                      "roadCctv": state.radioSelections["roadCctv"] == YesNo.Yes
+                          ? "${state.radioSelections["roadCctv"].toString().substring(6)} As per The Guard"
+                          : state.radioSelections["roadCctv"].toString().substring(6),                            "guardingRoom": state.radioSelections["guardingRoom"].toString().substring(6),
+                      "guardAttac": state.radioSelections["guardAttac"].toString().substring(6),
+                      "policere": state.radioSelections["policere"].toString().substring(6),
+                      "islegal": state.radioSelections["islegal"].toString().substring(6),
+                      "manager": state.radioSelections["manager"].toString().substring(6),
+                      "super": state.radioSelections["super"].toString().substring(6),
+                      "photos": state.radioSelections["photos"].toString().substring(6),
+                      "videos": state.radioSelections["videos"].toString().substring(6),
+                      "invereport": state.radioSelections["invereport"].toString().substring(6),
+                      "vodafone": state.radioSelections["vodafone"].toString().substring(6),
+                      "othereq": state.radioSelections["othereq"] == YesNo.Yes
+                          ? "${state.radioSelections["othereq"].toString().substring(6)} OR/ET/WE"
+                          : state.radioSelections["othereq"].toString().substring(6),                            "authEqu": state.radioSelections["authEqu"].toString().substring(6),
+                      "concreate": state.radioSelections["concreate"].toString().substring(6),
+                      "sitehis": _siteHistoryController.text,
+                      "guardname": _nameGuardController.text,
+                      "guardcon": _contactGuardController.text,
+                      "guardid": _idGuardController.text,
+                      "invdet": _investigationController.text,
+                      "corective": _correctiveController.text,
+                      "attackDetailes": _guardAttackDController.text,
+                      "finalconc": _finalController.text,
+                      "legalAction": _legalController.text,
+                      "persons": _involvedController.text,
+                      "policenu": _policeNuController.text,
+
+                    },
+                    images: _selectedImages,
+                  ));
+
+
+                }
+                else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Fill required data"),
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }, title:  'Export & Send', icon:  Icons.email,),
+
 
             ],
           ),

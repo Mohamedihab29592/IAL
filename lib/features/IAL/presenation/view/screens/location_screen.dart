@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/widgets/appBar.dart';
+import '../../../../../core/widgets/button.dart';
 import '../../../../../core/widgets/my_form_field.dart';
 import '../../../data/Model/site_model.dart';
 import '../../controller/bloc.dart';
@@ -88,58 +89,35 @@ class LocationsScreen extends StatelessWidget {
               controller: _longController,
             ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(const Color(0xFFD32F2F)),
-                ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final String lat = _latController.text;
-                    final String long = _longController.text;
+            Button(    onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                final String lat = _latController.text;
+                final String long = _longController.text;
 
-                    // Create proper URI
-                    final Uri googleMapsUri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$long');
+                // Create proper URI
+                final Uri googleMapsUri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$long');
 
-                    if (await canLaunchUrl(googleMapsUri)) {
-                      await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
-                    } else {
-                      print('Could not open maps. URL: ${googleMapsUri.toString()}');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Could not open maps. URL: ${googleMapsUri.toString()}'),
-                        ),
-                      );
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please fill required data"),
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 8.0),
-                      Text(
-                        'Get Location',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ],
+                if (await canLaunchUrl(googleMapsUri)) {
+                  await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
+                } else {
+                  print('Could not open maps. URL: ${googleMapsUri.toString()}');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Could not open maps. URL: ${googleMapsUri.toString()}'),
+                    ),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Please fill required data"),
+                    duration: Duration(seconds: 3),
                   ),
-                ),
-              ),
-            ),
+                );
+              }
+            }, title:  'Get Location', icon:   Icons.location_on_outlined,),
+
+
           ],
         ),
       ),

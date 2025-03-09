@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/constants/enum.dart';
 import '../../../../../core/widgets/appBar.dart';
+import '../../../../../core/widgets/button.dart';
 import '../../../../../core/widgets/images_widget.dart';
 import '../../../../../core/widgets/my_form_field.dart';
 import '../../../data/Model/site_model.dart';
@@ -1098,97 +1099,73 @@ class _IncidentReportFormState extends State<IncidentReportForm> {
                 height: 10,
               ),
               //Export
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(const Color(0xFFD32F2F)),
-                  ),
-                  onPressed: () {
-                    if(_formKey.currentState!.validate())
-                      {
-                        context.read<IncidentBloc>().add(ExportDocumentEvent(
-                          formData: {
-                            "date": _dateController.text,
-                            "type": _incidentTypeController.text,
-                            "time": _timeController.text,
-                            "reported": _reporterController.text,
-                            "siteId": _locationController.text,
-                            "address": _addressController.text,
-                            "detailes": _detailsController.text,
-                            "location": _incidentLocationController.text,
-                            "missing": _missingController.text,
-                            "socAction": state.radioSelections["socAction"] == YesNo.Yes
-                                ? "${state.radioSelections["socAction"].toString().substring(6)} we called the guard and the sheikh but no answer"
-                                : state.radioSelections["socAction"].toString().substring(6),
+              Button(  onPressed: () {
+                if(_formKey.currentState!.validate())
+                {
+                  context.read<IncidentBloc>().add(ExportDocumentEvent(
+                    formData: {
+                      "date": _dateController.text,
+                      "type": _incidentTypeController.text,
+                      "time": _timeController.text,
+                      "reported": _reporterController.text,
+                      "siteId": _locationController.text,
+                      "address": _addressController.text,
+                      "detailes": _detailsController.text,
+                      "location": _incidentLocationController.text,
+                      "missing": _missingController.text,
+                      "socAction": state.radioSelections["socAction"] == YesNo.Yes
+                          ? "${state.radioSelections["socAction"].toString().substring(6)} we called the guard and the sheikh but no answer"
+                          : state.radioSelections["socAction"].toString().substring(6),
 
-                            "doorAlarm": state.radioSelections[
-                            "doorAlarm"].toString().substring(6),
-                            "guardExsist": state.radioSelections["guardExsist"].toString().substring(6),
-                            "doorOpen": state.radioSelections["doorOpen"].toString().substring(6),
-                            "cctv": state.radioSelections["cctv"].toString().substring(6),
-                            "roadCctv": state.radioSelections["roadCctv"] == YesNo.Yes
-                                ? "${state.radioSelections["roadCctv"].toString().substring(6)} As per The Guard"
-                                : state.radioSelections["roadCctv"].toString().substring(6),                            "guardingRoom": state.radioSelections["guardingRoom"].toString().substring(6),
-                            "guardAttac": state.radioSelections["guardAttac"].toString().substring(6),
-                            "policere": state.radioSelections["policere"].toString().substring(6),
-                            "islegal": state.radioSelections["islegal"].toString().substring(6),
-                            "manager": state.radioSelections["manager"].toString().substring(6),
-                            "super": state.radioSelections["super"].toString().substring(6),
-                            "photos": state.radioSelections["photos"].toString().substring(6),
-                            "videos": state.radioSelections["videos"].toString().substring(6),
-                            "invereport": state.radioSelections["invereport"].toString().substring(6),
-                            "vodafone": state.radioSelections["vodafone"].toString().substring(6),
-                            "othereq": state.radioSelections["othereq"] == YesNo.Yes
-                                ? "${state.radioSelections["othereq"].toString().substring(6)} OR/ET/WE"
-                                : state.radioSelections["othereq"].toString().substring(6),                            "authEqu": state.radioSelections["authEqu"].toString().substring(6),
-                            "concreate": state.radioSelections["concreate"].toString().substring(6),
-                            "sitehis": _siteHistoryController.text,
-                            "guardname": _nameGuardController.text,
-                            "guardcon": _contactGuardController.text,
-                            "guardid": _idGuardController.text,
-                            "invdet": _investigationController.text,
-                            "corective": _correctiveController.text,
-                            "attackDetailes": _guardAttackDController.text,
-                            "finalconc": _finalController.text,
-                            "legalAction": _legalController.text,
-                            "persons": _involvedController.text,
-                            "policenu": _policeNuController.text,
+                      "doorAlarm": state.radioSelections[
+                      "doorAlarm"].toString().substring(6),
+                      "guardExsist": state.radioSelections["guardExsist"].toString().substring(6),
+                      "doorOpen": state.radioSelections["doorOpen"].toString().substring(6),
+                      "cctv": state.radioSelections["cctv"].toString().substring(6),
+                      "roadCctv": state.radioSelections["roadCctv"] == YesNo.Yes
+                          ? "${state.radioSelections["roadCctv"].toString().substring(6)} As per The Guard"
+                          : state.radioSelections["roadCctv"].toString().substring(6),                            "guardingRoom": state.radioSelections["guardingRoom"].toString().substring(6),
+                      "guardAttac": state.radioSelections["guardAttac"].toString().substring(6),
+                      "policere": state.radioSelections["policere"].toString().substring(6),
+                      "islegal": state.radioSelections["islegal"].toString().substring(6),
+                      "manager": state.radioSelections["manager"].toString().substring(6),
+                      "super": state.radioSelections["super"].toString().substring(6),
+                      "photos": state.radioSelections["photos"].toString().substring(6),
+                      "videos": state.radioSelections["videos"].toString().substring(6),
+                      "invereport": state.radioSelections["invereport"].toString().substring(6),
+                      "vodafone": state.radioSelections["vodafone"].toString().substring(6),
+                      "othereq": state.radioSelections["othereq"] == YesNo.Yes
+                          ? "${state.radioSelections["othereq"].toString().substring(6)} OR/ET/WE"
+                          : state.radioSelections["othereq"].toString().substring(6),                            "authEqu": state.radioSelections["authEqu"].toString().substring(6),
+                      "concreate": state.radioSelections["concreate"].toString().substring(6),
+                      "sitehis": _siteHistoryController.text,
+                      "guardname": _nameGuardController.text,
+                      "guardcon": _contactGuardController.text,
+                      "guardid": _idGuardController.text,
+                      "invdet": _investigationController.text,
+                      "corective": _correctiveController.text,
+                      "attackDetailes": _guardAttackDController.text,
+                      "finalconc": _finalController.text,
+                      "legalAction": _legalController.text,
+                      "persons": _involvedController.text,
+                      "policenu": _policeNuController.text,
 
-                          },
-                          imageFiles: _selectedImages,
-                        ));
+                    },
+                    imageFiles: _selectedImages,
+                  ));
 
 
-                      }
-                    else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Fill required data"),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.import_export,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 8.0),
-                        Text(
-                          'Export To Word',
-                          style: TextStyle(fontSize: 20, color: Colors.white),
-                        ),
-                      ],
+                }
+                else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Fill required data"),
+                      duration: Duration(seconds: 3),
                     ),
-                  ),
-                ),
-              ),
+                  );
+                }
+              }, title:  'Export To Word', icon:  Icons.import_export,),
+
             ],
           ),
         ),
